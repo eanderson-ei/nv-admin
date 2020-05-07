@@ -1,0 +1,10 @@
+﻿hqt_version,season,attribute,hab_function,score_weight
+1,breed,sage_cover,cover,0.2
+1,breed,shrub_cover,cover,0.3
+1,breed,forb_cover,forage,0.25
+1,breed,forb_rich,forage,0.25
+1,summer,forb_cover,forage,0.375
+1,summer,forb_rich,forage,0.375
+1,summer,grass_cover,cover,0.25
+1,winter,sage_cover,#N/A,0.5
+1,winter,sage_height,#N/A,0.5

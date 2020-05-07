@@ -1,0 +1,23 @@
+INSERT INTO field_info(
+    map_unit_id,
+    map_unit_name,
+    transect_id,
+    transect_bearing,
+    utm_e,
+    utm_n,
+    evaluated,
+    date_observed,
+    observers,
+    start_time,
+    stop_time,
+    utm_e_actual,
+    utm_n_actual,
+    bearing_actual,
+    photo_ids,
+    meadow,
+    sage_species,
+    dist_sage,
+    shrubs_species,
+    transect_change,
+    notes)
+    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)

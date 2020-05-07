@@ -1,0 +1,13 @@
+﻿hqt_version,wildfire,rr,contribution
+1,high,high,0.01
+1,high,moderate,0.02
+1,high,low,0.03
+1,high,very low,0.04
+1,moderate,high,0.02
+1,moderate,moderate,0.03
+1,moderate,low,0.04
+1,moderate,very low,0.05
+1,low,high,0.03
+1,low,moderate,0.04
+1,low,low,0.05
+1,low,very low,0.06

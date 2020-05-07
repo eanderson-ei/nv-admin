@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS field_info (
+    map_unit_id integer,
+    map_unit_name text,
+    transect_id integer,
+    transect_bearing integer,
+    utm_e real,
+    utm_n real,
+    evaluated text,
+    date_observed text,
+    observers text,
+    start_time text,
+    stop_time text,
+    utm_e_actual real,
+    utm_n_actual real,
+    bearing_actual integer,
+    photo_ids text,
+    meadow text,
+    sage_species text,
+    dist_sage real,
+    shrubs_species text,
+    transect_change text,
+    notes text
+);
