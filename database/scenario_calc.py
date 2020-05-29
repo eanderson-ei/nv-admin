@@ -24,7 +24,7 @@ def run_scenario(site_scale_values_indexed, improvements):
     # Set up empty dict for storing outcomes
     outcomes = {}
 
-    projected = site_scale_values_indexed.drop(columns=site_scale_values_indexed.columns)
+    projected = site_scale_values_indexed.drop(site_scale_values_indexed.columns, axis=1)
 
     for hab_attr in improvements.keys():
         filt = site_scale_values_indexed.columns.str.endswith(hab_attr)
@@ -177,13 +177,14 @@ def run_scenario_report(project, save_interims=False):
     
     # Compile saleable_credits for each scenario into a single dataframe
     list_of_credit_reports = list(credit_reports.items())  # make list to maintain order
-    first_scenario, first_credit_report = list_of_credit_reports[0]
-    scenario_report = first_credit_report[['map_unit_id', 'map_unit_name', 
+    first_scenario, first_scenario_report = list_of_credit_reports[0]
+    scenario_report = first_scenario_report[['map_unit_id', 'map_unit_name', 
                                            'meadow', 'map_unit_area',
                                            'saleable_credits']].copy()
-    scenario_report.rename({'saleable_credits': first_scenario}, axis=1, inplace=True)
+    scenario_report.rename(columns = {'saleable_credits': first_scenario}, inplace=True)
+        
     for name, data in list_of_credit_reports[1:]:
-        data.rename({'saleable_credits': name}, axis=1, inplace=True)
+        data.rename(columns = {'saleable_credits': name}, inplace=True)
         scenario_report = pd.merge(scenario_report, data[['map_unit_id', name]],
                                    how='outer', on='map_unit_id', 
                                    suffixes=(False, False))
@@ -193,7 +194,7 @@ def run_scenario_report(project, save_interims=False):
     
     # Append to scenario report
     conifer_report = conifer_credits[['map_unit_id', 'saleable_credits']].copy()
-    conifer_report.rename({'saleable_credits': 'conifer'}, axis=1, inplace=True)
+    conifer_report.rename(columns = {'saleable_credits': 'conifer'}, inplace=True)
     scenario_report = pd.merge(scenario_report, conifer_report, how='outer',
                                on='map_unit_id', suffixes=(False, False))
     
@@ -201,22 +202,26 @@ def run_scenario_report(project, save_interims=False):
         # Save outputs
         for name, data in credit_reports.items():
             save_name = name + '.csv'
-            calc.save_output(data, save_name)
+            calc.save_output(workspace, data, save_name)
             
         # Save outputs
-        calc.save_output(conifer_credits, 'conifer_credits.csv')
+        calc.save_output(workspace, conifer_credits, 'conifer_credits.csv')
     
     return scenario_report
 
 
 def main():
-    # Instantiate CreditData object
-    C = CreditData(db='test.db')
+    workspace = r'D:\ArcGIS\Nevada\Nevada Conservation Credit System\AdminMaterials\Test05182020'
+    db = os.path.join(workspace, 'crawford.db')
+    current_credits = pd.read_csv(os.path.join(workspace, 'current_credits.csv'), index_col=0)
     
-    scenario_report = run_scenario_report(C, save_interims=True)
+    # Instantiate CreditData object
+    C = CreditData(db=db)
+    
+    scenario_report = run_scenario_report(C, save_interims=False)
     
     # Save outputs
-    calc.save_output(scenario_report, 'scenario_report.csv')
+    calc.save_output(workspace, scenario_report, 'scenario_report.csv')
     
     # Close conn
     C.conn.close()

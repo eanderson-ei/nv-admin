@@ -36,7 +36,7 @@ def score_site_scale(project, site_scale_values):
         if np.isnan(hab_value):
             return 0
         else:
-            return scoring_curves.loc[floor(hab_value), curve_name]
+            return scoring_curves.loc[int(floor(hab_value)), curve_name]
     
 
     # Create site scale score dataframe
@@ -51,7 +51,7 @@ def score_site_scale(project, site_scale_values):
     
     # b_sage_cover is the straight score
     score = 'b_sage_cover'
-    value = curve_lookup[score]
+    value = curve_lookup[score]  # evaluates to value = sage_cover
     site_scale_scores[score] = (
         site_scale_values[value]
         .apply(lambda x: score_attribute(x*100, score))
@@ -266,8 +266,9 @@ def score_site_scale(project, site_scale_values):
     
     # helper function for returning func_weight
     def get_func_weight(season, hab_function):
+        scoring_weights_ungroup = scoring_weights.reset_index()  # for pandas v0.16
         function_weights = (
-            scoring_weights.groupby(['season', 'hab_function']).sum()
+            scoring_weights_ungroup.groupby(['season', 'hab_function']).sum()
         )
         return function_weights.loc[(season, hab_function), 'score_weight']
     
@@ -515,8 +516,7 @@ def calc_credits(project, desktop_results, pre_facre_report, post_facre_report):
             'map_unit_name', 
             'meadow', 
             'map_unit_area'], 
-        suffixes=('_pre', '_post'), 
-        validate='1:1')
+        suffixes=('_pre', '_post'))
     
     # calculate deltas per season
     for season in ['breed', 'summer', 'winter']:
@@ -558,10 +558,9 @@ def calc_credits(project, desktop_results, pre_facre_report, post_facre_report):
         on='map_unit_id')
     
     # apply meadow multiplier
-    filt = standard_values['variable'] == 'meadow_multiplier'
+    standard_values.set_index('variable', inplace=True)
     meadow_multiplier = (
-        standard_values.loc[filt, 'standard_value']
-        .to_numpy()[0]
+        standard_values.at['meadow_multiplier', 'standard_value']
     )
     credit_compare['meadow_multiplier'] = meadow_multiplier
     
@@ -763,14 +762,17 @@ def run_calculator(project, projected_values_input=None):
     return current_credits, projected_credits
 
 
-def save_output(output, file_name):
-    save_name = os.path.join('data/outputs', file_name)
+def save_output(workspace, output, file_name):
+    save_name = os.path.join(workspace, file_name)
     output.to_csv(save_name)
         
     
 def main():
+    workspace = r'D:\ArcGIS\Nevada\Nevada Conservation Credit System\AdminMaterials\Test05182020'
+    db = os.path.join(workspace, 'crawford.db')
+    
     # Instantiate CreditData object
-    C = CreditData(db='test.db')
+    C = CreditData(db=db)
                    
     # run calculator
     current_credits, projected_credits = run_calculator(
@@ -779,8 +781,8 @@ def main():
         )
     
     # save outputs
-    save_output(current_credits, 'current_credits.csv')
-    save_output(projected_credits, 'projected_credits.csv')
+    save_output(workspace, current_credits, 'current_credits.csv')
+    save_output(workspace, projected_credits, 'projected_credits.csv')
     
     # Close conn
     C.conn.close()

@@ -191,7 +191,6 @@ def generate_reports(map_units_dissolve, default_gdb, template_path,
     mu_lyr = arcpy.mapping.ListLayers(mxd, mu_base_name)[0]
 
     # read in attribute data for symbolization
-    credit_report = pd.read_csv(os.path.join(outputs, 'projected_credits.csv'))  # TODO: read from database
     credit_report = credit_report[['map_unit_id', 'saleable_credits']]
     credit_report['saleable_credits'] = credit_report['saleable_credits'].fillna(0)
     credit_report['saleable_credits'] = credit_report['saleable_credits'].round(2)

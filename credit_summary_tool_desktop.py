@@ -29,8 +29,6 @@ User should save a copy of the template in the output directory. A PDF report
 will also be saved there.
 """
 
-#TODO: Move script file to AdminTools folder and update template_path with scriptPath
-
 import arcpy
 import os
 import sys
@@ -41,7 +39,8 @@ from reports import desktop_map_report
 from database.models import CreditData
 from database.database import build_database
 from database.credit_calc import run_calculator
-
+from database.scenario_calc import run_scenario_report
+from reports import plotting
 
 def main():
         
@@ -58,7 +57,6 @@ def main():
     
     # Define path to map template
     template_path = scriptPath.split('Lib')[0]
-    map_template_name = 'Summary_template_testing.mxd'    
     # Define path to policy tables data
     policy_tables_path = os.path.join(scriptPath, 'data', 'policy-tables')
     # Sub in scriptPath for template_path as script should live in Admin
@@ -92,12 +90,33 @@ def main():
     arcpy.AddMessage('building report')
     
     # Build map reports
-    desktop_map_report.generate_reports(map_units_dissolve,
-                                        default_gdb, 
-                                        template_path,
-                                        project_name,
-                                        outputs,
-                                        projected_credits)    
+    desktop_map_report.generate_reports(
+        map_units_dissolve,
+        default_gdb, 
+        template_path,
+        project_name,
+        outputs,
+        projected_credits
+    )
+    
+    # Get scenario results
+    scenario_report = run_scenario_report(C)
+    
+    # Create and save plots
+    current_data = current_credits
+    proj_data = projected_credits
+    projcredits = proj_data[['map_unit_id', 'saleable_credits']]
+    projcredits.rename(columns = {'saleable_credits': 'proj_credits'}, inplace= True)
+    
+    plotting.update_pdf(
+        outputs, 
+        current_data,
+        proj_data,
+        scenario_report
+    )
+    
+    C.conn.close()
+    
     
 # EXECUTE SCRIPT
 

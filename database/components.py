@@ -1,6 +1,7 @@
 import sqlite3
 from sqlite3 import Error
 import sys
+from arcpy import AddMessage
 
 
 def create_connection(db_file):
@@ -13,7 +14,9 @@ def create_connection(db_file):
     try:
         conn = sqlite3.connect(db_file)
     except Error as e:
-        print (e)
+        # conn.close()
+        AddMessage(e)
+        sys.exit(0)
     
     return conn
 
@@ -29,7 +32,9 @@ def create_table(conn, create_table_sql):
         c = conn.cursor()
         c.execute(create_table_sql)
     except Error as e:
-        print (e)
+        conn.close()
+        AddMessage (e)
+        sys.exit(0)
 
 
 def insert_data(conn, sql_file, data):
@@ -46,7 +51,8 @@ def insert_data(conn, sql_file, data):
         c = conn.cursor()
         c.execute(sql, data)
     except Error as e:
-        print(e)
+        conn.close()
+        AddMessage(e)
         sys.exit(0)
     
     return c.lastrowid
@@ -65,5 +71,6 @@ def create_view(conn, sql_file):
         c = conn.cursor()
         c.execute(sql)
     except Error as e:
-        print(e)
+        conn.close()
+        AddMessage(e)
         sys.exit(0)

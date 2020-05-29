@@ -1,2 +1,5 @@
 *.pyc
 .vscode/
+arcdesktop/
+notebooks/
+*.db
