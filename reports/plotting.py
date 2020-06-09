@@ -36,7 +36,7 @@ from matplotlib.font_manager import FontProperties
 
 # TODO: Add switch to import arcpy.mp in Pro
 from arcpy.mapping import PDFDocumentOpen
-from arcpy import Delete
+from arcpy import Delete_management as Delete
 
 plt.rcParams['font.sans-serif'] = 'Tahoma'
 plt.rcParams['font.family'] = 'sans-serif'
@@ -202,11 +202,8 @@ def figure_one_ea(current_data, proj_data):
                     fontsize=font_size)
     
     # Add Legend
-    ax2.legend(['Projected Credits', 'Current Credits'],
-               loc='lower right',
-               frameon=True,
-               borderpad=.75,
-               fancybox=True)
+    # ax2.legend(plot2_curr, ['Projected Credits', 'Current Credits'],
+    #            loc=4)
     
     # TABLE
     # define table
@@ -490,7 +487,7 @@ def figure_two_ea(scenario_data, current_data, proj_data):
      # right subplot shows current and projected credits
     plot_max = ax2.barh(
         bottom=np.arange(len(df.index)), 
-        width=df['max'], 
+        width=df['current_credits'] + df['max'],  # scenario credits are calculated relative to current credits
         color=df['color'],
         align='center',
         height=bar_height,
@@ -528,8 +525,8 @@ def figure_two_ea(scenario_data, current_data, proj_data):
                 fontweight='bold')
     
     # calculate additional credits and set negative to zero
-    df['add_credits'] = df['max'] - (df['current_credits'] + df['proj_credits'])
-    filt = df['add_credits'] < 0
+    df['add_credits'] = (df['current_credits'] + df['max']) - (df['current_credits'] + df['proj_credits'])
+    filt = df['add_credits'] <= 0
     df.loc[filt, 'add_credits'] = 0
     df.loc[filt, 'idmax'] = ''
     
@@ -555,11 +552,11 @@ def figure_two_ea(scenario_data, current_data, proj_data):
                         fontsize=font_size)
     
     # Add Legend
-    ax2.legend(plot_total, ['Projected Credits'],
-               loc='lower right',
-               frameon=True,
-               borderpad=.75,
-               fancybox=True)
+    # ax2.legend(plot_total, ['Projected Credits'],
+    #            loc=4,
+    #            frameon=True,
+    #            borderpad=.75,
+    #            fancybox=True)
     
     # TABLE
     # define table
@@ -1003,7 +1000,7 @@ def update_pdf(workspace, current_data, proj_data, scenario_data):
     
     fig2 = figure_two_ea(scenario_data, current_data, proj_data)
     chart_two = os.path.join(workspace, 'regime_summary_chart.pdf')
-    regminepdf = fig2.savefig(chart_two, bbox_inches='tight')
+    fig2.savefig(chart_two, bbox_inches='tight')
 
     # MERGE AND SAVE
     title_page = os.path.join(workspace, 'Credit_Summary_Report.pdf')
@@ -1017,6 +1014,7 @@ def update_pdf(workspace, current_data, proj_data, scenario_data):
     map_series_loc = os.path.join(workspace, 'series.pdf')
     series = PDFDocumentOpen(map_series_loc)
     pdfDoc1.appendPages(map_series_loc)
+    series.saveAndClose()
     
     # Save and close
     pdfDoc1.saveAndClose()

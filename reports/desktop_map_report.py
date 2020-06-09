@@ -142,7 +142,7 @@ def generate_reports(map_units_dissolve, default_gdb, template_path,
             elm.text = project_name
 
     # Export title page
-    save_name = os.path.join(outputs, 'title_page.pdf')
+    save_name = os.path.join(outputs, 'Credit_Summary_Report.pdf')
     arcpy.mapping.ExportToPDF(mxd, save_name)
 
 

@@ -38,7 +38,7 @@ import numpy as np
 from reports import desktop_map_report
 from database.models import CreditData
 from database.database import build_database
-from database.credit_calc import run_calculator
+from database.credit_calc import run_calculator, save_output
 from database.scenario_calc import run_scenario_report
 from reports import plotting
 
@@ -74,10 +74,10 @@ def main():
     arcpy.AddMessage('creating database, please be patient')
     # Create database, read in calculator and policy tables
     database_path = os.path.join(outputs, project_name + '.db')
-    build_database(database_path, project_calc,
-                   policy_tables_path)
+    # build_database(database_path, project_calc,
+    #                policy_tables_path)
     
-    arcpy.AddMessage('database created')
+    # arcpy.AddMessage('database created')
     
     # Instantiate CreditData object
     C = CreditData(db=database_path)
@@ -101,6 +101,7 @@ def main():
     
     # Get scenario results
     scenario_report = run_scenario_report(C)
+    save_output(outputs, scenario_report, 'scenario_report.csv')
     
     # Create and save plots
     current_data = current_credits
