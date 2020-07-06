@@ -74,10 +74,10 @@ def main():
     arcpy.AddMessage('creating database, please be patient')
     # Create database, read in calculator and policy tables
     database_path = os.path.join(outputs, project_name + '.db')
-    # build_database(database_path, project_calc,
-    #                policy_tables_path)
+    build_database(database_path, project_calc,
+                   policy_tables_path)
     
-    # arcpy.AddMessage('database created')
+    arcpy.AddMessage('database created')
     
     # Instantiate CreditData object
     C = CreditData(db=database_path)
