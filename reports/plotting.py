@@ -1020,9 +1020,12 @@ def update_pdf(workspace, current_data, proj_data, scenario_data):
     pdfDoc1.saveAndClose()
     
     # Delete intermediate reports
-    Delete(map_series_loc)
-    Delete(chart_one)
-    Delete(chart_two)
+    try:
+        Delete(map_series_loc)
+        Delete(chart_one)
+        Delete(chart_two)
+    except:
+        pass
     
 
 if __name__ == '__main__':
